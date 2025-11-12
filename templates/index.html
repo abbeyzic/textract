@@ -1,0 +1,299 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<title>TexTract | Extract Texts from Images</title>
+{% endblock %}
+
+ {% block body %}
+<nav class="navbar navbar-default" id="navmarg0">
+{% if logged_in %}
+    <div class="container-fluid">
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span> 
+        </button>
+        <div class="collapse navbar-collapse" id="myNavbar">
+            <div class="navbar-header">
+                <a href="/" class="navbar-brand boldark">TexTract</a>
+            </div>
+            <ul class="nav navbar-nav navbar-right" >
+                <li><a href="/history">History</a></li> 
+                <li><a href="/" >profile</a></li>
+                <li><a href="/logout">Logout</a></li>
+            </ul>
+        </div>
+    </div>
+{% else %}
+    <div class="container-fluid">
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span> 
+        </button>
+        <div class="collapse navbar-collapse" id="myNavbar">
+            <div class="navbar-header boldark">
+                <a href="/" class="navbar-brand">TexTract</a>
+            </div>
+            <ul class="nav navbar-nav navbar-right" >
+                <li><a href="/login"><span class="glyphicon glyphicon-log-in"></span>Login</a></li>
+                <li><a href="/register"><span class="glyphicon glyphicon-user"></span>Register</a></li>
+            </ul>
+        </div>
+    </div>
+{% endif %}
+</nav>
+<div class="jumbotron" id="tron-marg0">
+    <h2><mark>Extract text</mark> on any Image</h2> 
+    <p>Your number one flask text extractor, upload any image and get the text on the image out available for you to copy.</p>
+    <div class="input-form" >
+        <form action="/" method="post" role="form" enctype="multipart/form-data">
+            <input type="file" name="imagefile"  id="imagefile" accept="image/*">
+            <br>
+            <input type="submit" value="Get File"  id="btn_textract" style="margin: 10px;">
+        </form>
+    </div>
+</div>
+<!--Flash Messages-->
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        {% for category, message in messages %}
+            <div class="alert-{{ category }}" id="flashme">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+{% endwith %}
+
+<!-- Images Table and result loop -->
+<!--The Table shows when "Get File" Table is clicked-->
+{% if images %}
+<div class="content2">
+    <div class="uploaded-files">
+        
+        <h3>Uploaded Images</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Filename</th>
+                    <th>Size</th>
+                    <th>Date Uploaded</th>
+                    <th colspan="2" style="text-align: center;">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for image in images %}
+                <tr id = "{{ image.id }}">
+                    <td>{{ image.filename }}</td>
+                    <td>{{ image.filesize }}</td>
+                    <td>{{ image.date_created.strftime('%Y-%m-%d %H:%M') }}</td>
+                    <td><button class="btn btn-extract" data-id="{{ image.id }}">Extract</button></td>
+                    <td><button class="btn btn-remove" data-id="{{ image.id }}">Remove</button></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>   
+{% endif %}
+
+    <!-- Extraction Results  Appear Here-->
+    <div class="content3" id="outputs-container">
+    {% for image in images %}
+        {% if image.text_extracted %}
+            <div class="output-formbox" data-image-id="{{ image.id }}" >
+                <h4><button class="btn btn-clear"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-lg" viewBox="0 0 16 16">
+  <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z"/>
+</svg></button></h4>
+                <h5><i>Done from {{ image.filename }}</i></h5>
+                <div class="text-area-container">
+                    <textarea name="extracted-text" class="extracted-text" cols="50" rows="5">{{ image.text_extracted }}</textarea>                            </div>
+                <p class="word-count">Word Count: {{ image.words  }}</p>
+                <br>
+                <button class="btn btn-copy">Copy</button>
+                <!-- <button id="btn btn-save-text" disabled>Save</button> -->
+                {% if logged_in %}
+                <button id="btn btn-history"><a href="/history"><span><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-bookmark" viewBox="0 0 16 16">
+  <path d="M2 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v13.5a.5.5 0 0 1-.777.416L8 13.101l-5.223 2.815A.5.5 0 0 1 2 15.5zm2-1a1 1 0 0 0-1 1v12.566l4.723-2.482a.5.5 0 0 1 .554 0L13 14.566V2a1 1 0 0 0-1-1z"/>
+</svg></span> History</a></button>
+                {% endif %}
+                <button id="btn btn-upload-another">Upload Another Image</button>
+            </div>
+            <hr>
+        {% endif %}
+    {% endfor %}
+</div>
+<!-- Steps -->
+<div class="steps-section">
+    <h3>How it works</h3>
+    <div class="steps-container">
+        <div class="step">
+            <span class="stepnum">1</span>
+            <span class="steptxt">Upload Image</span>
+        </div>
+        <div class="step">
+            <span class="stepnum">2</span>
+            <span class="steptxt">Click on Get File</span>
+        </div>
+        <div class="step">
+           <span class="stepnum">3</span>
+           <span class="steptxt">Click Extract in the table</span>
+        </div>
+    </div>
+</div>
+<hr>
+<div class="faq-section" >
+    <h5>Frequently Asked Questions</h5>
+    <details>
+        <summary>What is TexTract?</summary>
+        <p>Textract is a free online tool for extracting Texts from an image</p>
+    </details>
+    
+    <details>
+         <summary>How do I use TexTract?</summary>
+        <p>Simply upload an image containing text, and TexTract will extract the text for you to copy and use as needed.</p>
+    </details>
+    
+    <details>
+        <summary>Is TexTract free to use?</summary>
+        <p>Yes, TexTract is completely free to use for extracting text from images.</p>
+    </details>
+    
+    <details>
+        <summary>What image formats are supported?</summary>
+        <p>TexTract supports common image formats such as JPEG, PNG, BMP, and GIF.</p>
+    </details>
+    <details>
+        <summary>Is my data secure?</summary>
+        <p>We prioritize your privacy and data security. Uploaded images are processed securely and not shared with third parties.</p>
+    </details>
+</div>
+<footer class="text-center">
+  <a class="up-arrow" href="/" data-toggle="tooltip" title="TO TOP">
+    <span class="glyphicon glyphicon-chevron-up"></span>
+  </a><br><br>
+  <p>© 2025 TexTract. All rights reserved.<a href="/" data-toggle="tooltip" title="email abbey"><i>abbeyzicmedia@gmail.com</i></a></p> 
+</footer>
+
+    <!-- Template for output boxes -->
+    <template id="output-template">
+            <div class="output-formbox" data-image-id="">
+                <h4><button class="btn btn-clear"><span><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-lg" viewBox="0 0 16 16">
+  <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z"/>
+</svg></span></button></h4>
+                <h5><i>Done</i></h5>
+                <div class="text-area-container">
+                    <textarea name="extracted-text" class="extracted-text" cols="50" rows="5" readonly></textarea>
+                </div>
+                <p class="word-count">Word Count: 0</p>
+                <br>
+                <button class="btn btn-copy">Copy</button>
+                <button class="btn btn-history" ><a href="/history">History</a></button>
+                <button class="btn btn-upload-another">Upload Another Image</button>
+            </div>
+            <hr>
+        </template>
+    {% if not logged_in %}
+    <script>
+        window.addEventListener('beforeunload', function(){
+            fetch('/cleanup_temp', {
+                method:'POST',
+                keepalive: true
+            }); 
+        });
+    </script>
+    {% endif %}
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const outputsContainer = document.getElementById('outputs-container');
+            const outputTemplate = document.getElementById('output-template');
+            
+
+
+            // helper to create and return a cloned output box element
+            function createOutputBox(imageId, filename, text, words) {
+                const tpl = outputTemplate.content.cloneNode(true);
+                const box = tpl.querySelector('.output-formbox');
+                
+                box.dataset.imageId = imageId;
+                box.querySelector('.extracted-text').value = text;
+                box.querySelector('.word-count').textContent = `Word Count: ${words}`;
+                box.querySelector('h5 i').textContent = `Done from ${filename}`;
+
+                // wire up buttons for this box
+                box.querySelector('.btn-clear').addEventListener('click', () => box.remove());
+
+                //Copy button
+                box.querySelector('.btn-copy').addEventListener('click', () => {
+                    navigator.clipboard.writeText(box.querySelector('.extracted-text').value)
+                        .then(() => { 
+                            const b = box.querySelector('.btn-copy'); 
+                            b.textContent = 'Copied!'; 
+                            setTimeout(()=> b.textContent='Copy',2000); 
+                        });
+                });
+
+                box.querySelector('.btn-upload-another').addEventListener('click', () => {
+                    window.location.href = '/'; 
+                });
+                
+                return box;
+            }
+
+            // Extract button handlers
+            document.querySelectorAll('.btn-extract').forEach(button => {
+                button.addEventListener('click', function() {
+                    const imageId = this.dataset.id;
+                    const filename = this.closest('tr')?.querySelector('td')?.textContent || '';
+                    this.textContent = 'Extracting...';
+                    this.disabled = true;
+
+                    fetch(`/extract/${imageId}`, { 
+                        method: 'POST' 
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                // append a new output box
+                                const box = createOutputBox(imageId, filename, data.text, data.words);
+                                outputsContainer.appendChild(box);
+                            } else {
+                                alert('Error extracting text: ' + data.error);
+                            }
+                        })
+                        .catch(err => { console.error(err); alert('Unexpected error'); })
+                        .finally(() => { this.textContent = 'Extract'; this.disabled = false; });
+                });
+            });
+
+            // Remove button handlers (also remove any output box for that image)
+            document.querySelectorAll('.btn-remove').forEach(button => {
+                button.addEventListener('click', function() {
+                    const imageId = this.dataset.id;
+                    const row = this.closest('tr');
+                    if (!confirm('Are you sure?')) return;
+                    fetch(`/delete/${imageId}`, { method: 'POST' })
+                        .then(r => r.json())
+                        .then (data => {
+                            if (data.success) {
+                                if (row) row.remove();
+                                const box = outputsContainer.querySelector(`.output-formbox[data-image-id="${imageId}"]`);
+                                if (box) box.remove();
+                            } else alert('Unable to delete image: ' + data.error);
+                        })
+                        .catch(err => { console.error(err); alert('Delete failed'); });
+                });
+            });
+
+            // wire copy/clear for any boxes already rendered on page load
+            outputsContainer.querySelectorAll('.output-formbox').forEach(box => {
+                box.querySelector('.btn-clear')?.addEventListener('click', () => box.remove());
+                box.querySelector('.btn-copy')?.addEventListener('click', () => {
+                    navigator.clipboard.writeText(box.querySelector('.extracted-text').value)
+                        .then(() => { const b = box.querySelector('.btn-copy'); b.textContent = 'Copied!'; setTimeout(()=> b.textContent='Copy',2000); });
+                });
+                box.querySelector('.btn-upload-another')?.addEventListener('click', () => { window.location.href = '/'; });
+            });
+        });
+        
+    </script>
+ {% endblock %}

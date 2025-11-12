@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<title>History</title>
+{% endblock %}
+
+{% block body %}
+<h2>History</h2>
+{% with messages= get_flashed_messages(with_categories=True) %}
+    {% if messages %}
+        <ul class=flashes>
+        {% for category, message in messages %}
+        <li class="{{ category }}">{{ message }}</li>
+        {% endfor %}
+        </ul>
+    {% endif %}
+    {% endwith %}
+
+<table>
+    <thead>
+        <tr>
+            <th>Filename</th>
+            <th>Size</th>
+            <th>Date Uploaded</th>
+            <th>Words</th>
+            <th>Text Extracted</th>
+            
+        </tr>
+    </thead>
+    {% for file in files %}
+    <tbody>
+        
+        <tr id = "{{ file.id }}" >
+            <td>{{ file.filename }}</td>
+            <td>{{ file.filesize }}</td>
+            <td>{{ file.date_created }}</td>
+            <td>{{ file.words }}</td>
+            <td>{{ file.text_extracted }}</td>
+        </tr>
+        
+    </tbody>
+    {% endfor %}
+</table>
+
+
+{% endblock %}

@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block head %}
+<title>Sign Up</title>
+{% endblock %}
+
+{% block body %}
+<h2>Sign Up an Account</h2>
+<form method="post">
+    <label for="email">Enter Your Email</label>
+    <input type="email" name="email" id="email" placeholder="lagbaja@abd.com" required>
+    
+    <label for="username">Enter username</label>
+    <input type="text" name="username" id="username" placeholder="unique username" required>
+    
+    <label for="password">Create Password</label>
+    <input type="password" name="password" id="password" required>
+    
+    <label for="password_confirm">Confirm Password</label>
+    <input type="password" name="password_confirm" id="password_confirm" required>
+    {% if error %}
+        <p style="color: red;">{{ error }}</p>
+    {% endif %}    
+    <button class="btn" type="submit">Register</button>
+</form>
+<p>Already have an account?<a href="/login">Login now</a></p>
+{% endblock %}

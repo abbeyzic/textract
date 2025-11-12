@@ -1,0 +1,254 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<title>TexTract | Extract Texts from Images</title>
+{% endblock %}
+
+ {% block body %}
+    <div class="content">
+        <div class="navbar-header">
+            <h3><a href="/">TexTract</a></h3>
+            {% if logged_in %}
+                <ul class="nav navbar-nav">
+                    <li><a href="/history">History</a></li> 
+                    <li><a href="/profile">profile</a></li>
+                    <li><a href="/logout">Logout</a></li>
+                </ul>
+            {% else %}
+                <ul class="nav navbar-nav">
+                    <li><a href="/login">Login</a></li>
+                    <li><a href="/register">Register</a></li>
+                </ul>
+            {% endif %}
+        </div>
+        <div class="hero-upload">
+            <div class="hero">
+                <h3 class="herotext" style="text-align: center; font-size: 30px;">Extract text on any Image</h3>
+                <p style="text-align: center;">Your number one flask text extractor, upload any image and get the text on the image out available for you to copy</p>
+            </div>
+            <div class="input-form" >
+                <form action="/" method="post" enctype="multipart/form-data">
+                    <input type="file" name="imagefile" id="imagefile" accept="image/*">
+                    <br>
+                    <input type="submit" value="Get File" id="btn_textract" style="margin: 10px;">
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!--Flash Messages-->
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    {% if images %}
+
+    <!-- Images Table and result loop -->
+    <div class="content2">
+        <!--The Table shows when "Get File" Table is clicked-->
+        <div class="uploaded-files">
+            <h5>Uploaded Images</h5>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Filename</th>
+                        <th>Size</th>
+                        <th>Date Uploaded</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for image in images %}
+                    <tr id = "{{ image.id }}">
+                        <td>{{ image.filename }}</td>
+                        <td>{{ image.filesize }}</td>
+                        <td>{{ image.date_created.strftime('%Y-%m-%d %H:%M') }}</td>
+                        <td><button class="btn btn-extract" data-id="{{ image.id }}">Extract</button></td>
+                        <td><button class="btn btn-remove" data-id="{{ image.id }}">Remove</button></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <hr>
+    
+        {% endif %}
+
+        <!-- Extraction Results  Appear Here-->
+            <div class="outputs-container" id="outputs-container">
+            {% for image in images %}
+                {% if image.text_extracted %}
+                    <div class="output-formbox" data-image-id="{{ image.id }}" >
+                        <h4><button class="btn btn-clear">X</button></h4>
+                        <h5><i>Done from {{ image.filename }}</i></h5>
+                        <div class="text-area-container">
+                            <textarea name="extracted-text" class="extracted-text" cols="50" rows="5">{{ image.text_extracted }}</textarea>                            </div>
+                        <p class="word-count">Word Count: {{ image.words  }}</p>
+                        <br>
+                        <button class="btn btn-copy">Copy</button>
+                        <!-- <button id="btn btn-save-text" disabled>Save</button> -->
+                        {% if logged_in %}
+                        <button id="btn btn-history"> <a href="/history">History</a></button>
+                        {% endif %}
+                        <button id="btn btn-upload-another">Upload Another Image</button>
+                    </div>
+                    <hr>
+                {% endif %}
+            {% endfor %}
+    </div>
+    <br>
+    
+    
+    <div class="faq-section">
+        FAQ</div>
+        <details>
+            <summary>What is TexTract?</summary>
+            <p>Textract is a free online tool for extracting Texts from an image</p>
+        </details>
+        <details>
+            <summary>How do I use TexTract?</summary>
+            <p>Simply upload an image containing text, and TexTract will extract the text for you to copy and use as needed.</p>
+        </details>
+        <details>
+            <summary>Is TexTract free to use?</summary>
+            <p>Yes, TexTract is completely free to use for extracting text from images.</p>
+        </details>
+        <details>
+            <summary>What image formats are supported?</summary>
+            <p>TexTract supports common image formats such as JPEG, PNG, BMP, and GIF.</p>
+        </details>
+    
+        <details>
+            <summary>Is my data secure?</summary>
+            <p>We prioritize your privacy and data security. Uploaded images are processed securely and not shared with third parties.</p>
+        </details>
+    </div>
+
+    <!-- Template for output boxes -->
+    <template id="output-template">
+            <div class="output-formbox" data-image-id="">
+                <h4><button class="btn btn-clear">X</button></h4>
+                <h5><i>Done</i></h5>
+                <div class="text-area-container">
+                    <textarea name="extracted-text" class="extracted-text" cols="50" rows="5" readonly></textarea>
+                </div>
+                <p class="word-count">Word Count: 0</p>
+                <br>
+                <button class="btn btn-copy">Copy</button>
+                <button class="btn btn-history" >History</button>
+                <button class="btn btn-upload-another">Upload Another Image</button>
+            </div>
+            <hr>
+        </template>
+    {% if not logged_in %}
+    <script>
+        window.addEventListener('beforeunload', function(){
+            fetch('/cleanup_temp', {
+                method:'POST',
+                keepalive: true
+            }); 
+        });
+    </script>
+    {% endif %}
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const outputsContainer = document.getElementById('outputs-container');
+            const outputTemplate = document.getElementById('output-template');
+            
+
+
+            // helper to create and return a cloned output box element
+            function createOutputBox(imageId, filename, text, words) {
+                const tpl = outputTemplate.content.cloneNode(true);
+                const box = tpl.querySelector('.output-formbox');
+                const saveBtn = box.querySelector('.btn-save-text');
+
+                box.dataset.imageId = imageId;
+                box.querySelector('.extracted-text').value = text;
+                box.querySelector('.word-count').textContent = `Word Count: ${words}`;
+                saveBtn.dataset.id = imageId;
+
+                // wire up buttons for this box
+                box.querySelector('.btn-clear').addEventListener('click', () => box.remove());
+
+                //Copy button
+                box.querySelector('.btn-copy').addEventListener('click', () => {
+                    navigator.clipboard.writeText(box.querySelector('.extracted-text').value)
+                        .then(() => { 
+                            const b = box.querySelector('.btn-copy'); 
+                            b.textContent = 'Copied!'; 
+                            setTimeout(()=> b.textContent='Copy',2000); 
+                        });
+                });
+
+                box.querySelector('.btn-upload-another').addEventListener('click', () => {
+                    window.location.href = '/'; 
+                });
+                
+                return box;
+            }
+
+            // Extract button handlers
+            document.querySelectorAll('.btn-extract').forEach(button => {
+                button.addEventListener('click', function() {
+                    const imageId = this.dataset.id;
+                    const filename = this.closest('tr')?.querySelector('td')?.textContent || '';
+                    this.textContent = 'Extracting...';
+                    this.disabled = true;
+
+                    fetch(`/extract/${imageId}`, { 
+                        method: 'POST' 
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                // append a new output box
+                                const box = createOutputBox(imageId, filename, data.text, data.words);
+                                outputsContainer.appendChild(box);
+                            } else {
+                                alert('Error extracting text: ' + data.error);
+                            }
+                        })
+                        .catch(err => { console.error(err); alert('Unexpected error'); })
+                        .finally(() => { this.textContent = 'Extract'; this.disabled = false; });
+                });
+            });
+
+            // Remove button handlers (also remove any output box for that image)
+            document.querySelectorAll('.btn-remove').forEach(button => {
+                button.addEventListener('click', function() {
+                    const imageId = this.dataset.id;
+                    const row = this.closest('tr');
+                    if (!confirm('Are you sure?')) return;
+                    fetch(`/delete/${imageId}`, { method: 'POST' })
+                        .then(r => r.json())
+                        .then (data => {
+                            if (data.success) {
+                                if (row) row.remove();
+                                const box = outputsContainer.querySelector(`.output-formbox[data-image-id="${imageId}"]`);
+                                if (box) box.remove();
+                            } else alert('Unable to delete image: ' + data.error);
+                        })
+                        .catch(err => { console.error(err); alert('Delete failed'); });
+                });
+            });
+
+            // wire copy/clear for any boxes already rendered on page load
+            outputsContainer.querySelectorAll('.output-formbox').forEach(box => {
+                box.querySelector('.btn-clear')?.addEventListener('click', () => box.remove());
+                box.querySelector('.btn-copy')?.addEventListener('click', () => {
+                    navigator.clipboard.writeText(box.querySelector('.extracted-text').value)
+                        .then(() => { const b = box.querySelector('.btn-copy'); b.textContent = 'Copied!'; setTimeout(()=> b.textContent='Copy',2000); });
+                });
+                box.querySelector('.btn-upload-another')?.addEventListener('click', () => { window.location.href = '/'; });
+            });
+        });
+        
+    </script>
+ {% endblock %}

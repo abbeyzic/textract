@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>App TexTract 1.0</title>
+    <link rel="stylesheet" href="{{url_for('static','styles.css')}}">
+</head>
+<body>
+    <div class="content">
+        <div class="navbar"><h1 class="home">TexTract</h1></div>
+        <div class="hero">
+            <h3 class="herotext">Extract text on any Image</h3>
+            <p>Your number one flask text extractor, upload any image and get the text on the image out available for you to copy</p>
+        </div>
+        <div class="input-form">
+            <form action="/" method="post">
+                <input type="file" name="imagefile" id="imagefile">
+                <br>
+                <input type="submit" value="Get Text" id="btn_textract">
+            </form>
+        </div>
+        <hr>
+        <div class="output-formbox">
+            <h5><i>Done</i></h5>
+            <textarea name="extracted-text" id="xtracted-text" cols="50" rows="5">Extracted Text</textarea>
+            <br>
+            <button>Save</button>
+            <button>History</button>
+            <button>Upload Another Image</button>
+        </div>
+        <hr>
+        <div class="faq-section">
+            <b>What is TexTract?</b>
+            <p>Textract is a free online tool for extracting Texts from an image</p>
+        </div>
+    </div>
+</body>
+</html>

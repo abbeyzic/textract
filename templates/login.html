@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% block head %}
+<title>Login</title>
+{% endblock %}
+
+{% block body %}
+
+<h2>Login to your account</h2>
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        <div class="alert-{{ category }}">{{ message }}</div>
+    {% endif %}
+{% endwith %}
+<form method="post">
+    <label for="username">Enter Username or Email</label>
+    <input type="text" name="username" id="username" required>
+
+    <label for="password">Enter Password</label>
+    <input type="password" name="password" id="password" required>
+
+    {% if error %}
+        <p class="error"><strong>Error:</strong>{{ error }}</p>
+    {% endif %}
+
+    <input type="submit" class="btn btn default" value="Login">
+</form>
+
+<p><a href="/register">Create an account</a></p>
+
+
+{% endblock %}
