@@ -1,0 +1,71 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(135deg, #71b7e6, #3f58c5);
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+form {
+    width: 360px;
+    background: white;
+    padding: 1.3rem;
+    border-radius: 20px;
+}
+
+form legend {
+    text-align: center;
+    font-size: 23px;
+    font-weight: 600;
+    margin-bottom: 1rem;
+}
+
+.det-container,
+.jstfy {
+    display: flex;
+    flex-direction: column;
+}
+
+.det-container>input {
+    width: 100%;
+    height: 43px;
+    font-family: 'poppins';
+    font-size: 17px;
+    padding: 0px 10px;
+    outline: none;
+    background-color: #e9e9e9;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin-bottom: 15px;
+    transition: all ease .4s;
+}
+
+.det-container input:focus {
+    border-color: #063757;
+}
+
+.det-container label {
+    cursor: pointer;
+    width: fit-content;
+}
+
+
+.loginBtn {
+    cursor: pointer;
+    width: 100%;
+    height: 43px;
+    background-color: #0084ff;
+    font-size: 14px;
+    color: white;
+    font-weight: bold;
+    border: none;
+    border-radius: 5px;
+}
+

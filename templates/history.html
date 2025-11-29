@@ -15,32 +15,103 @@
         </ul>
     {% endif %}
     {% endwith %}
+<div class="card-shadow history-wrap">
+    <table class="history-table">
+        <thead>
+            <tr>
+                <th class="filename">Filename</th>
+                <th class="size">Size</th>
+                <th class="date">Date Uploaded</th>
+                <th class="words">Words</th>
+                <th class="actions">Text / Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for file in files %}
+            <tr id="{{ file.id }}">
+                <td class="filename">{{ file.filename }}</td>
+                <td class="size">{{ file.filesize }}</td>
+                <td class="date">{{ file.date_created }}</td>
+                <td class="words">{{ file.words }}</td>
+                <td class="actions-cell">
+                    <button class="btn btn-primary btn-view-text">View Text</button>
 
-<table>
-    <thead>
-        <tr>
-            <th>Filename</th>
-            <th>Size</th>
-            <th>Date Uploaded</th>
-            <th>Words</th>
-            <th>Text Extracted</th>
+                    <!-- delete icon button - keeps data-id for existing JS -->
+                    <button class="btn-delete" data-id="{{ file.id }}" title="Delete" aria-label="Delete">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true">
+                            <path d="M5.5 5.5A.5.5 0 0 1 6 5h4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-.5.5H6a.5.5 0 0 1-.5-.5v-7z"/>
+                            <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1 0-2H5.5l.5-.5h4l.5.5H13.5a1 1 0 0 1 1 1z"/>
+                        </svg>
+                    </button>
+
+                    <!-- hidden pre preserves newlines and whitespace -->
+                    <pre class="hidden-text" style="display:none">{{ file.text_extracted }}</pre>
+                </td>
+            </tr>
             
-        </tr>
-    </thead>
-    {% for file in files %}
-    <tbody>
-        
-        <tr id = "{{ file.id }}" >
-            <td>{{ file.filename }}</td>
-            <td>{{ file.filesize }}</td>
-            <td>{{ file.date_created }}</td>
-            <td>{{ file.words }}</td>
-            <td>{{ file.text_extracted }}</td>
-        </tr>
-        
-    </tbody>
-    {% endfor %}
-</table>
+        {% endfor %}
+            <tr>
+                <td colspan="5" style="text-align: center; height: 30px;"><strong> >End of List< </strong></td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+<!-- Bootstrap modal to show extracted text -->
+<div id="textModal" class="modal fade" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title" style="text-align: center;">Extracted Text</h4>
+      </div>
+      <div class="modal-body">
+        <pre id="modalText" style="white-space: pre-wrap;"></pre>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
 
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  // View handler (already present)
+  document.querySelectorAll('.btn-view-text').forEach(btn => {
+    btn.addEventListener('click', function(){
+      const row = this.closest('tr');
+      const hidden = row.querySelector('.hidden-text');
+      const text = hidden ? hidden.innerText.trim() : '';
+      document.getElementById('modalText').innerText = text;
+      $('#textModal').modal('show');
+    });
+  });
+
+  // Delete handler: sends POST to /delete/<id> and removes row on success
+  document.querySelectorAll('.btn-delete').forEach(btn => {
+    btn.addEventListener('click', function(){
+      const id = this.dataset.id;
+      const row = this.closest('tr');
+      if (!confirm('Delete this record and file?')) return;
+
+      fetch(`/delete/${id}`, { method: 'POST' })
+        .then(r => r.json())
+        .then(data => {
+          if (data && data.success) {
+            // close modal if this row's text is showing
+            $('#textModal').modal('hide');
+            row.remove();
+          } else {
+            alert('Unable to delete: ' + (data?.error || 'unknown error'));
+          }
+        })
+        .catch(err => {
+          console.error('Delete error', err);
+          alert('Unexpected error deleting record');
+        });
+    });
+  });
+});
+</script>
 
 {% endblock %}

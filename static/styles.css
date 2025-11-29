@@ -13,6 +13,9 @@ body{
 /*Navigation bar */
 nav{
     margin: 0 10px;
+    /* subtle elevated shadow for navbar */
+    box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+    z-index: 50;
 }
 ul{
     list-style-type: none;
@@ -131,10 +134,10 @@ tr td{
 }
 
 th {
-    background-color: rgb(212, 191, 191);
+    background-color: rgb(58, 126, 234);
     text-align: left;
     padding: 3px 10px 3px 3px;
-    color: black;
+    color: rgb(255, 248, 214);
     width: 100%;
 }
 
@@ -199,3 +202,91 @@ footer {
  textarea{
     resize: none;
  }
+
+.history-table {
+    width: 100%;
+    table-layout: fixed; /* enforce column widths */
+    border-collapse: collapse;
+}
+
+/* set preferred widths per column (adjust percentages as needed) */
+.history-table th.filename,
+.history-table td.filename { width: 40%; }
+.history-table th.size,
+.history-table td.size { width: 10%; }
+.history-table th.date,
+.history-table td.date { width: 20%; }
+.history-table th.words,
+.history-table td.words { width: 10%; }
+.history-table th.actions,
+.history-table td.actions,
+.history-table td.actions-cell { width: 20%; }
+
+/* ensure long filenames don't push layout */
+.history-table th,
+.history-table td {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    padding: 6px 8px;
+}
+
+/* allow View button to remain normal and align icons */
+.btn-view-text { margin-right: 8px; }
+
+/* delete icon button */
+.btn-delete {
+    background: transparent;
+    border: none;
+    color: #c62828; /* red */
+    padding: 4px;
+    cursor: pointer;
+    vertical-align: middle;
+}
+.btn-delete svg { display: inline-block; vertical-align: middle; }
+
+/* provide hover affordance */
+.btn-delete:hover { color: #a00; transform: scale(1.05); }
+
+/* small screens: allow wrapping for actions to avoid overflow */
+@media (max-width: 640px) {
+    .history-table { table-layout: auto; }
+    .history-table th, .history-table td { white-space: normal; }
+}
+
+/* reusable card shadow for main template sections */
+.card-shadow {
+    background: #fff;               /* ensures the shadow is visible */
+    border-radius: 8px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+    -webkit-box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+    transition: box-shadow 180ms ease;
+}
+
+/* slightly stronger hover effect where appropriate */
+.card-shadow:hover {
+    box-shadow: 0 12px 30px rgba(0,0,0,0.10);
+}
+
+/* apply to key sections */
+.jumbotron,
+.uploaded-files,
+#outputs-container,
+.steps-section,
+.faq-section,
+footer {
+    /* keep existing visuals but add the shadow wrapper */
+    /* if element already has padding/margins, this wraps nicely */
+    box-shadow: none; /* avoid duplicate when used with class */
+}
+
+/* Use the class on these elements by default */
+.jumbotron { border-radius: 8px; }
+.uploaded-files { border-radius: 8px; }
+#outputs-container > .output-formbox { border-radius: 8px; }
+
+/* small-screen adjustments to keep shadow subtle */
+@media (max-width: 640px) {
+    nav { box-shadow: 0 4px 12px rgba(0,0,0,0.06); }
+    .card-shadow { box-shadow: 0 6px 18px rgba(0,0,0,0.06); }
+}

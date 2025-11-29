@@ -15,12 +15,12 @@
         </button>
         <div class="collapse navbar-collapse" id="myNavbar">
             <div class="navbar-header">
-                <a href="/" class="navbar-brand boldark">TexTract</a>
+                <a href="/" class="navbar-brand boldark" style="color: black;">TexTract</a>
             </div>
             <ul class="nav navbar-nav navbar-right" >
-                <li><a href="/history">History</a></li> 
-                <li><a href="/" >profile</a></li>
-                <li><a href="/logout">Logout</a></li>
+                <li><a href="/history" style="color: black;">History</a></li> 
+                <li><a href="/" style="color: black;" >profile</a></li>
+                <li><a href="/logout" style="color: black;">Logout</a></li>
             </ul>
         </div>
     </div>
@@ -33,18 +33,18 @@
         </button>
         <div class="collapse navbar-collapse" id="myNavbar">
             <div class="navbar-header boldark">
-                <a href="/" class="navbar-brand">TexTract</a>
+                <a href="/" class="navbar-brand" style="color: black;">TexTract</a>
             </div>
             <ul class="nav navbar-nav navbar-right" >
-                <li><a href="/login"><span class="glyphicon glyphicon-log-in"></span>Login</a></li>
-                <li><a href="/register"><span class="glyphicon glyphicon-user"></span>Register</a></li>
+                <li><a href="/login" style="color: black;"><span class="glyphicon glyphicon-log-in"></span>Login</a></li>
+                <li><a href="/register" style="color: black;" ><span class="glyphicon glyphicon-user"></span>Register</a></li>
             </ul>
         </div>
     </div>
 {% endif %}
 </nav>
-<div class="jumbotron" id="tron-marg0">
-    <h2><mark>Extract text</mark> on any Image</h2> 
+<div class="jumbotron card-shadow" id="tron-marg0">
+    <h2 ><strong style="color: blue;">Extract text</strong> on any Image</h2> 
     <p>Your number one flask text extractor, upload any image and get the text on the image out available for you to copy.</p>
     <div class="input-form" >
         <form action="/" method="post" role="form" enctype="multipart/form-data">
@@ -67,13 +67,13 @@
 <!--The Table shows when "Get File" Table is clicked-->
 {% if images %}
 <div class="content2">
-    <div class="uploaded-files">
+    <div class="uploaded-files card-shadow">
         
         <h3>Uploaded Images</h3>
         <table>
             <thead>
                 <tr>
-                    <th>Filename</th>
+                    <th style="padding-left: 5px;">Filename</th>
                     <th>Size</th>
                     <th>Date Uploaded</th>
                     <th colspan="2" style="text-align: center;">Action</th>
@@ -99,7 +99,7 @@
     <div class="content3" id="outputs-container">
     {% for image in images %}
         {% if image.text_extracted %}
-            <div class="output-formbox" data-image-id="{{ image.id }}" >
+            <div class="output-formbox card-shadow" data-image-id="{{ image.id }}" >
                 <h4><button class="btn btn-clear"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-lg" viewBox="0 0 16 16">
   <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z"/>
 </svg></button></h4>

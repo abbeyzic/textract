@@ -16,11 +16,9 @@ app = Flask(__name__)
 app.secret_key = "I'm-not-telling-you"
 Scss(app)
 
-
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///database.db"
 app.config['UPLOAD_FOLDER'] = 'static/uploads'
 db = SQLAlchemy(app)
-
 #Database models
 class ImageExtracted(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
