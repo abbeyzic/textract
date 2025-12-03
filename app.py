@@ -11,7 +11,6 @@ import os
 
 pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
 
-#My App
 app = Flask(__name__)
 app.secret_key = "I'm-not-telling-you"
 Scss(app)
@@ -259,3 +258,4 @@ if __name__ == '__main__':
 	with app.app_context():
 		db.create_all()
 	app.run(debug=True)
+	
